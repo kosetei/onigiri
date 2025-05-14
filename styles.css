@@ -1,0 +1,507 @@
+/* 全体のスタイル */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Meiryo', 'Hiragino Kaku Gothic Pro', sans-serif;
+}
+
+body {
+    background-color: #f7f3e9;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #e65100;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #e65100;
+    margin: 15px 0;
+    font-size: 1.5rem;
+}
+
+/* ゲーム情報エリア */
+.game-info {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* 上部の結果表示 */
+.game-result-top {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ゲームボード */
+.game-board {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 親のおむすびエリア */
+.secret-onigiri-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    background-color: #fbe9e7;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px dashed #ffab91;
+}
+
+/* おにぎり形状（三角形） */
+.onigiri-placeholder {
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 60px solid #ffccbc;
+    position: relative;
+    margin: 0 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.onigiri-placeholder::after {
+    content: "?";
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #e64a19;
+}
+
+/* フィードバック凡例 */
+.feedback-legend {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 15px;
+}
+
+.legend-item .feedback-icon {
+    margin-right: 10px;
+}
+
+/* 履歴エリア */
+.history-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.history-row {
+    display: flex;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    align-items: center;
+}
+
+.history-number {
+    font-weight: bold;
+    margin-right: 10px;
+    min-width: 20px;
+}
+
+.history-onigiri {
+    display: flex;
+    flex-grow: 1;
+}
+
+/* 履歴のおにぎり（三角形） */
+.history-onigiri-item {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 40px solid #fff;
+    position: relative;
+    margin: 0 10px;
+}
+
+.history-onigiri-item::after {
+    content: attr(data-type);
+    position: absolute;
+    top: 15px;
+    left: -15px;
+    font-size: 10px;
+    text-align: center;
+    width: 30px;
+}
+
+.history-feedback {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.feedback-count {
+    display: flex;
+    align-items: center;
+    margin: 0 5px;
+}
+
+.feedback-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+.ocha {
+    background-color: #a5d6a7;
+    color: #1b5e20;
+}
+
+.oshinko {
+    background-color: #fff59d;
+    color: #f57f17;
+}
+
+/* 現在の予想エリア */
+.current-guess {
+    display: flex;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.onigiri-selection {
+    display: flex;
+    flex-grow: 1;
+}
+
+/* 選択スロットのおにぎり（三角形） */
+.onigiri-slot {
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 60px solid #fff8e1;
+    position: relative;
+    margin: 0 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.onigiri-slot::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: -15px;
+    font-size: 14px;
+    width: 30px;
+    text-align: center;
+}
+
+.onigiri-slot.selected {
+    border-bottom-color: #ffe0b2;
+}
+
+.onigiri-slot.selected::after {
+    content: attr(data-type);
+}
+
+.feedback-display {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+
+.feedback-display .feedback-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+/* おむすびオプション */
+.onigiri-options {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+/* おにぎり選択肢（三角形） */
+.onigiri-type {
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 50px solid #fff;
+    position: relative;
+    margin: 0 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.onigiri-type::after {
+    content: attr(data-type);
+    position: absolute;
+    top: 20px;
+    left: -20px;
+    font-size: 12px;
+    width: 40px;
+    text-align: center;
+}
+
+.onigiri-type:hover {
+    transform: translateY(-5px);
+}
+
+.onigiri-type[data-type="しお"] {
+    border-bottom-color: #f5f5f5;
+}
+
+.onigiri-type[data-type="うめ"] {
+    border-bottom-color: #ffcdd2;
+}
+
+.onigiri-type[data-type="さけ"] {
+    border-bottom-color: #ffccbc;
+}
+
+.onigiri-type[data-type="こんぶ"] {
+    border-bottom-color: #c8e6c9;
+}
+
+.onigiri-type[data-type="たらこ"] {
+    border-bottom-color: #f8bbd0;
+}
+
+.onigiri-type[data-type="ふりかけ"] {
+    border-bottom-color: #e1bee7;
+}
+
+.onigiri-type[data-type="かつおぶし"] {
+    border-bottom-color: #d7ccc8;
+}
+
+/* コントロールボタン */
+.controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+#submit-guess {
+    background-color: #4caf50;
+    color: white;
+}
+
+#submit-guess:hover {
+    background-color: #388e3c;
+}
+
+#clear-selection {
+    background-color: #f44336;
+    color: white;
+}
+
+#clear-selection:hover {
+    background-color: #d32f2f;
+}
+
+#new-game, #play-again {
+    background-color: #2196f3;
+    color: white;
+}
+
+#new-game:hover, #play-again:hover {
+    background-color: #1976d2;
+}
+
+button:disabled {
+    background-color: #e0e0e0;
+    color: #9e9e9e;
+    cursor: not-allowed;
+}
+
+/* ゲーム結果 */
+.game-result {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.secret-reveal {
+    margin: 20px 0;
+}
+
+.secret-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* 正解のおにぎり（三角形） */
+.secret-onigiri {
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 60px solid #fff;
+    position: relative;
+    margin: 0 15px;
+}
+
+.secret-onigiri::after {
+    content: attr(data-type);
+    position: absolute;
+    top: 25px;
+    left: -20px;
+    font-size: 12px;
+    width: 40px;
+    text-align: center;
+}
+
+/* ルールエリア */
+.rules-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.rules-container ol {
+    padding-left: 20px;
+}
+
+.rules-container ul {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+.ocha-text {
+    color: #1b5e20;
+    font-weight: bold;
+}
+
+.oshinko-text {
+    color: #f57f17;
+    font-weight: bold;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .onigiri-options {
+        justify-content: flex-start;
+        padding-bottom: 10px;
+    }
+    
+    .onigiri-type {
+        margin: 0 5px;
+    }
+    
+    .onigiri-slot {
+        margin: 0 10px;
+    }
+    
+    .controls {
+        flex-wrap: wrap;
+    }
+    
+    button {
+        margin: 5px;
+        flex-grow: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .onigiri-type {
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-bottom: 40px solid #fff;
+    }
+    
+    .onigiri-type::after {
+        top: 15px;
+        left: -15px;
+        font-size: 10px;
+        width: 30px;
+    }
+    
+    .onigiri-slot {
+        border-left: 25px solid transparent;
+        border-right: 25px solid transparent;
+        border-bottom: 50px solid #fff8e1;
+        margin: 0 5px;
+    }
+    
+    .onigiri-slot::after {
+        top: 20px;
+        left: -12px;
+        font-size: 10px;
+        width: 24px;
+    }
+    
+    .feedback-legend {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .legend-item {
+        margin: 5px 0;
+    }
+}
