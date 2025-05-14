@@ -1,313 +1,103 @@
-import React, { useState, useEffect, useRef } from 'react';
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>おむすび探偵団</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>おむすび探偵団</h1>
+        
+        <div class="game-info">
+            <p>親が選んだ4つのおむすびの種類と順番を当てましょう！</p>
+            <p>残り試行回数: <span id="attempts-left">7</span></p>
+            <p>現在の試行: <span id="current-attempt">1</span> / 7</p>
+        </div>
 
-const OnigiriDetective = () => {
-  // おむすびの種類 (背景色も追加)
-  const onigiriTypes = [
-    { id: 0, name: 'ツナマヨ', emoji: '🍙', bgColor: 'bg-yellow-100' },
-    { id: 1, name: '鮭', emoji: '🍙', bgColor: 'bg-rose-100' },
-    { id: 2, name: '梅干し', emoji: '🍙', bgColor: 'bg-pink-100' },
-    { id: 3, name: '昆布', emoji: '🍙', bgColor: 'bg-green-100' },
-    { id: 4, name: '明太子', emoji: '🍙', bgColor: 'bg-red-100' },
-    { id: 5, name: 'おかか', emoji: '🍙', bgColor: 'bg-orange-100' },
-    { id: 6, name: '塩むすび', emoji: '🍙', bgColor: 'bg-gray-100' }
-  ];
+        <div id="game-result-top" class="game-result-top hidden">
+            <h2 id="result-message-top"></h2>
+        </div>
 
-  // ゲームの状態
-  const [secretOnigiri, setSecretOnigiri] = useState([]);
-  const [currentGuess, setCurrentGuess] = useState([-1, -1, -1, -1]);
-  const [guessHistory, setGuessHistory] = useState([]);
-  const [attemptCount, setAttemptCount] = useState(0);
-  const [gameState, setGameState] = useState('playing'); // 'playing', 'won', 'lost'
-  const [message, setMessage] = useState('4つのおむすびを当ててください！残り挑戦回数: 7回');
-  const [draggedOnigiri, setDraggedOnigiri] = useState(null);
-
-  // ドラッグ用の参照
-  const dragRef = useRef(null);
-
-  // 新しいゲームを開始
-  const startNewGame = () => {
-    // 7種類から重複なしでランダムに4つ選ぶ
-    const shuffled = [...onigiriTypes].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, 4);
-    setSecretOnigiri(selected);
-    setCurrentGuess([-1, -1, -1, -1]);
-    setGuessHistory([]);
-    setAttemptCount(0);
-    setGameState('playing');
-    setMessage('4つのおむすびを当ててください！残り挑戦回数: 7回');
-    console.log("新しいゲームを開始しました", selected.map(o => o.name));
-  };
-
-  // コンポーネントマウント時に新しいゲームを開始
-  useEffect(() => {
-    startNewGame();
-  }, []);
-
-  // おむすび選択処理
-  const selectOnigiri = (onigiriId, position) => {
-    if (gameState !== 'playing') return;
-    
-    const newGuess = [...currentGuess];
-    newGuess[position] = onigiriId;
-    setCurrentGuess(newGuess);
-  };
-
-  // 設定済みの枠をタップした時に空欄に戻す
-  const clearPosition = (position) => {
-    if (gameState !== 'playing') return;
-    
-    const newGuess = [...currentGuess];
-    newGuess[position] = -1;
-    setCurrentGuess(newGuess);
-  };
-
-  // ドラッグ開始
-  const handleDragStart = (onigiriId) => {
-    if (gameState !== 'playing') return;
-    setDraggedOnigiri(onigiriId);
-  };
-
-  // ドラッグ終了
-  const handleDragEnd = () => {
-    setDraggedOnigiri(null);
-  };
-
-  // ドロップ処理
-  const handleDrop = (position) => {
-    if (gameState !== 'playing' || draggedOnigiri === null) return;
-    selectOnigiri(draggedOnigiri, position);
-    setDraggedOnigiri(null);
-  };
-
-  // 答え合わせ処理
-  const submitGuess = () => {
-    // 全て選択されているか確認
-    if (currentGuess.includes(-1)) {
-      setMessage('全ての位置におむすびを選んでください！');
-      return;
-    }
-
-    // 選択したおむすびを取得
-    const guessedOnigiri = currentGuess.map(id => onigiriTypes.find(o => o.id === id));
-
-    // お茶とおしんこの数を計算
-    let ocha = 0;
-    let oshinko = 0;
-    
-    // コピーを作成して検証
-    const secretCopy = [...secretOnigiri];
-    const guessCopy = [...guessedOnigiri];
-    
-    // 完全一致（おしんこ）をカウント
-    for (let i = 0; i < 4; i++) {
-      if (guessCopy[i].id === secretCopy[i].id) {
-        oshinko++;
-        guessCopy[i] = null;
-        secretCopy[i] = null;
-      }
-    }
-    
-    // 部分一致（お茶）をカウント
-    for (let i = 0; i < 4; i++) {
-      if (guessCopy[i] !== null) {
-        for (let j = 0; j < 4; j++) {
-          if (secretCopy[j] !== null && guessCopy[i].id === secretCopy[j].id) {
-            ocha++;
-            secretCopy[j] = null;
-            break;
-          }
-        }
-      }
-    }
-
-    // 履歴に追加
-    const newHistory = [...guessHistory, {
-      guess: [...guessedOnigiri],
-      ocha,
-      oshinko
-    }];
-    setGuessHistory(newHistory);
-    
-    // 挑戦回数を増やす
-    const newAttemptCount = attemptCount + 1;
-    setAttemptCount(newAttemptCount);
-    
-    // ゲーム状態を更新
-    if (oshinko === 4) {
-      setGameState('won');
-      setMessage('おめでとう！正解です！');
-    } else if (newAttemptCount >= 7) {
-      setGameState('lost');
-      setMessage(`残念！正解は ${secretOnigiri.map(o => o.name).join(', ')} でした。`);
-    } else {
-      setMessage(`残り挑戦回数: ${7 - newAttemptCount}回`);
-      setCurrentGuess([-1, -1, -1, -1]); // 次の推測用にリセット
-    }
-  };
-
-  // タッチイベント処理
-  const handleTouchStart = (e, onigiriId) => {
-    if (gameState !== 'playing') return;
-    
-    // ドラッグ開始
-    setDraggedOnigiri(onigiriId);
-    
-    const touch = e.touches[0];
-    dragRef.current = {
-      startX: touch.clientX,
-      startY: touch.clientY,
-      onigiriId
-    };
-  };
-
-  const handleTouchMove = (e) => {
-    if (!dragRef.current) return;
-    e.preventDefault(); // スクロール防止
-  };
-
-  const handleTouchEnd = (e, position) => {
-    if (!dragRef.current) return;
-    
-    // ドロップ処理
-    if (position !== undefined) {
-      selectOnigiri(dragRef.current.onigiriId, position);
-    }
-    
-    // リセット
-    dragRef.current = null;
-    setDraggedOnigiri(null);
-  };
-
-  return (
-    <div className="flex flex-col items-center p-4 max-w-md mx-auto bg-amber-50 rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold mb-4 text-amber-800">おむすび探偵団</h1>
-      
-      <div className="mb-4 p-2 bg-amber-100 rounded w-full text-center">
-        <p className="text-amber-800">{message}</p>
-      </div>
-
-      {/* 現在の推測 */}
-      <div className="flex justify-center gap-2 mb-6">
-        {currentGuess.map((onigiriId, index) => (
-          <div 
-            key={index} 
-            className={`w-16 h-16 flex items-center justify-center ${onigiriId >= 0 ? onigiriTypes[onigiriId].bgColor : 'bg-white'} rounded-lg shadow cursor-pointer hover:opacity-80`}
-            onClick={() => clearPosition(index)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={() => handleDrop(index)}
-            onTouchEnd={(e) => handleTouchEnd(e, index)}
-          >
-            {onigiriId >= 0 ? (
-              <div className="text-center">
-                <div className="text-2xl">{onigiriTypes[onigiriId].emoji}</div>
-                <div className="text-xs">{onigiriTypes[onigiriId].name}</div>
-              </div>
-            ) : (
-              <span className="text-gray-400">選択</span>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* おむすび選択エリア */}
-      <div className="grid grid-cols-7 gap-2 mb-6">
-        {onigiriTypes.map((onigiri) => (
-          <div 
-            key={onigiri.id} 
-            className={`w-12 h-12 flex flex-col items-center justify-center ${onigiri.bgColor} rounded-lg shadow cursor-pointer hover:opacity-80 ${draggedOnigiri === onigiri.id ? 'opacity-50' : ''}`}
-            onClick={() => {
-              // 最初の空いている場所に配置
-              const emptyIndex = currentGuess.indexOf(-1);
-              if (emptyIndex !== -1) {
-                selectOnigiri(onigiri.id, emptyIndex);
-              }
-            }}
-            draggable
-            onDragStart={() => handleDragStart(onigiri.id)}
-            onDragEnd={handleDragEnd}
-            onTouchStart={(e) => handleTouchStart(e, onigiri.id)}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            <div className="text-xl">{onigiri.emoji}</div>
-            <div className="text-xs">{onigiri.name}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* 送信ボタン */}
-      <button 
-        className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-600 disabled:bg-gray-300"
-        onClick={submitGuess}
-        disabled={gameState !== 'playing'}
-      >
-        答え合わせ
-      </button>
-
-      {/* 履歴 */}
-      <div className="mt-6 w-full">
-        <h2 className="text-lg font-bold mb-2 text-amber-800">履歴</h2>
-        {[...guessHistory].reverse().map((item, index) => {
-          const attemptNumber = guessHistory.length - index;
-          return (
-            <div key={index} className="flex items-center p-2 bg-white rounded mb-2 shadow">
-              <div className="w-8 flex-shrink-0 text-center">
-                <span className="font-bold text-amber-800">#{attemptNumber}</span>
-              </div>
-              <div className="flex-1 flex gap-2">
-                {item.guess.map((onigiri, i) => (
-                  <div key={i} className={`w-12 h-12 flex flex-col items-center justify-center ${onigiri.bgColor} rounded`}>
-                    <div className="text-xl">{onigiri.emoji}</div>
-                    <div className="text-xs">{onigiri.name}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-2 ml-4">
-                <div className="bg-green-100 p-1 rounded">
-                  <span className="text-green-800">お茶: {item.ocha}</span>
-                </div>
-                <div className="bg-purple-100 p-1 rounded">
-                  <span className="text-purple-800">おしんこ: {item.oshinko}</span>
-                </div>
-              </div>
+        <div class="game-board">
+            <div class="secret-onigiri-row" id="secret-onigiri-display">
+                <div class="onigiri-placeholder"></div>
+                <div class="onigiri-placeholder"></div>
+                <div class="onigiri-placeholder"></div>
+                <div class="onigiri-placeholder"></div>
             </div>
-          );
-        })}
-      </div>
 
-      {/* リセットボタン */}
-      {gameState !== 'playing' && (
-        <button 
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={startNewGame}
-        >
-          もう一度遊ぶ
-        </button>
-      )}
+            <div class="feedback-legend">
+                <div class="legend-item">
+                    <div class="feedback-icon ocha"></div>
+                    <span>お茶: 種類が合っているおむすびの数</span>
+                </div>
+                <div class="legend-item">
+                    <div class="feedback-icon oshinko"></div>
+                    <span>おしんこ: 種類と場所の両方が合っているおむすびの数</span>
+                </div>
+            </div>
 
-      {/* ルール説明 */}
-      <div className="mt-6 p-3 bg-amber-100 rounded w-full text-sm">
-        <h3 className="font-bold text-amber-800">ルール説明:</h3>
-        <ul className="list-disc pl-5 text-amber-700">
-          <li>親（コンピュータ）が7種類のおむすびから4つを選んで隠しています。</li>
-          <li>あなたは親が隠した4つのおむすびの種類と並び順を当てましょう。</li>
-          <li>「おしんこ」は種類と場所が合っているおむすびの数です。</li>
-          <li>「お茶」は種類は合っているが場所が違うおむすびの数です。</li>
-          <li>7回までの挑戦で、全てのおむすびを当てられれば勝ちです。</li>
-        </ul>
-      </div>
-      
-      {/* 操作方法 */}
-      <div className="mt-3 p-3 bg-blue-50 rounded w-full text-sm">
-        <h3 className="font-bold text-blue-800">操作方法:</h3>
-        <ul className="list-disc pl-5 text-blue-700">
-          <li>おむすびをタップすると、空き枠に配置されます。</li>
-          <li>おむすびをドラッグして、好きな枠に配置できます。</li>
-          <li>すでに配置されたおむすびをタップすると、空欄に戻ります。</li>
-        </ul>
-      </div>
+            <div class="current-guess">
+                <div class="onigiri-selection" id="current-selection">
+                    <div class="onigiri-slot" data-index="0"></div>
+                    <div class="onigiri-slot" data-index="1"></div>
+                    <div class="onigiri-slot" data-index="2"></div>
+                    <div class="onigiri-slot" data-index="3"></div>
+                </div>
+                <div class="feedback-display">
+                    <div class="feedback-icon ocha" id="ocha-count">0</div>
+                    <div class="feedback-icon oshinko" id="oshinko-count">0</div>
+                </div>
+            </div>
+
+            <div class="onigiri-options">
+                <div class="onigiri-type" data-type="しお"></div>
+                <div class="onigiri-type" data-type="うめ"></div>
+                <div class="onigiri-type" data-type="さけ"></div>
+                <div class="onigiri-type" data-type="こんぶ"></div>
+                <div class="onigiri-type" data-type="たらこ"></div>
+                <div class="onigiri-type" data-type="ふりかけ"></div>
+                <div class="onigiri-type" data-type="かつおぶし"></div>
+            </div>
+
+            <div class="controls">
+                <button id="submit-guess">予想を送信</button>
+                <button id="clear-selection">選択をクリア</button>
+                <button id="new-game">新しいゲーム</button>
+            </div>
+
+            <div class="history-container" id="history-container">
+                <!-- 過去の予想と結果がここに追加されます -->
+            </div>
+        </div>
+
+        <div id="game-result" class="game-result hidden">
+            <h2 id="result-message"></h2>
+            <div id="secret-onigiri-reveal" class="secret-reveal">
+                <p>親が選んだおむすび:</p>
+                <div class="secret-row"></div>
+            </div>
+            <button id="play-again">もう一度遊ぶ</button>
+        </div>
+
+        <div class="rules-container">
+            <h2>ゲームのルール</h2>
+            <ol>
+                <li>コンピューターが7種類のおむすび（しお、うめ、さけ、こんぶ、たらこ、ふりかけ、かつおぶし）の中から4つを選び、順序を決めます。</li>
+                <li>プレイヤーはコンピューターが選んだおむすびを予想して4つ並べます。</li>
+                <li>予想を送信すると、以下のヒントが表示されます：
+                    <ul>
+                        <li><span class="ocha-text">お茶</span>: 種類が合っているおむすびの数</li>
+                        <li><span class="oshinko-text">おしんこ</span>: 種類と場所の両方が合っているおむすびの数</li>
+                    </ul>
+                </li>
+                <li>ヒントを元に推理し、再度おむすびを4つ並べて予想します。</li>
+                <li>7回以内に全てのおむすびの種類と場所を当てればプレイヤーの勝ちです。</li>
+            </ol>
+        </div>
     </div>
-  );
-};
-
-export default OnigiriDetective;
+    <script src="script.js"></script>
+</body>
+</html>
